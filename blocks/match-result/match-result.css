@@ -1,0 +1,57 @@
+.dialog-modal {
+    max-width: 95vw;
+    width: fit-content;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 2px solid #fff;
+    border-radius: 30px;
+}
+
+.dialog-modal button.dialog-close {
+    right: 12.5px;
+}
+
+.player {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.player:not(.swap):hover {
+    background-color: var(--bs-teal);
+}
+
+.swap {
+    background-color: var(--bs-pink);
+}
+
+.swap .name {
+    color: #fff;
+}
+
+.match-result .btn {
+    box-shadow: none;
+}
+
+.copy-message {
+    min-height: 24px;
+    top: 12.5px;
+}
+
+.covered-positions {
+    min-width: 118px;
+    position: relative;
+}
+  
+.covered-positions.warning::after {
+    content: 'Missing position';
+    position: absolute;
+    color: #fff;
+    right: -150px;
+}
+
+@media (min-width: 576px ){
+    .player {
+        min-width: 455px;
+    }
+}

@@ -1,0 +1,217 @@
+.gnav, code {
+    display: none;
+}
+
+header ~ main {
+    margin: 0;
+}
+
+.team-config > div > div > strong {
+    display: flex;
+    justify-content: center;
+}
+
+.team-config a.modal {
+    display: block;
+    width: initial;
+    position: static;
+    font-style: normal;
+    height: auto;
+}
+
+.team-config strong a.modal {
+  color: #FFF;
+  padding: 14px 24px;
+  min-height: 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  margin: 30px auto;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+}
+
+div[data-path="/fragments/release-note"] {
+  padding: 3em;
+}
+
+
+a {
+    cursor: pointer;
+  }
+  
+  label, select {
+    cursor: pointer;
+  }
+  
+  label:hover,
+  label:active,
+  label:focus,
+  label.active {
+    background-color: var(--bs-blue);
+    color: #fff;
+  }
+  .head-label:hover {
+    background: inherit;
+    color: #000;
+  }
+  
+  .label-position-tank {
+    background-image: url('/assets/images/Tank_icon.svg');
+  }
+  
+  .label-position-deal {
+    background-image: url('/assets/images/Damage_icon.svg');
+  }
+  
+  .label-position-heal {
+    background-image: url('/assets/images/Support_icon.svg');
+  }
+  
+  .bg-grey-opacity {
+    background-color: #f0f0f0d4;
+  }
+  
+  .bg-dark-grey-opacity {
+    background-color: #2e3d54e8;
+  }
+  
+  .label-position, .level-participant label {
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 36px;
+    height: 36px;
+    text-align: center;
+    font-size: 18px;
+    padding-top: 5px;
+    padding-bottom: 3px;
+    font-weight: 400;
+    margin-bottom: 0;
+    border-radius: 3px;
+  }
+  
+  .label-position {
+    background-color: #43474d;
+  }
+  
+  .level-participant label:not(.active) {
+    background-color: #fff;
+    color: #555;
+  }
+  
+  .nm-as-row {
+    margin: 0 calc(-.5 * var(--bs-gutter-x));
+  }
+  
+  .input-error {
+  border: 1px solid red;  
+  }
+  
+  .trash-icon {
+    text-decoration: none;
+    font-size: 22px;
+    color: var(--bs-danger);
+    position: relative;
+    top: -2px
+  }
+  
+  .share-link {
+    font-size: 14px;
+  }
+  
+  .audio-player {
+    position: absolute;
+    right: 60px;
+    bottom: 35px;
+    border: 1px solid;
+    border-radius: 30px;
+    background-color: #f1f3f4;
+  }
+  
+  .level-config label {
+    cursor: pointer;
+  }
+  
+  .level-config label,
+  .level-config input {
+    font-size: 1rem;;
+    width: 36px;
+    text-align: center;
+  } 
+  
+  .participant-div:hover {
+    background-color: #387ab3a6;
+    transition: background-color .15s ease-in;
+  }
+  
+  .participant-div small {
+    font-size: 12px;
+  }
+  
+  .bgm-select {
+    border-radius: 7px;
+  }
+  
+  video {
+    z-index: 0;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    filter:grayscale(90%);
+  }
+  
+  .team-config {
+    position: relative;
+    z-index: 1;
+    background-image: url('/assets/images/HD-wallpaper-overwatch-2.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 1000px;
+  }
+  
+  .title, .rebalance-btn-container, .bg-dark-t {
+    background-color: #000000d4;
+  }
+  
+  /* for result */
+  .result {
+    font-size: 18px;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 0;
+  }
+  .level {
+    width: 65.1px;
+    font-weight: 700;
+  }
+  .level small {
+    font-weight: normal;
+  }
+  .icon {
+    background-color: var(--bs-blue);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 35px;
+    height: 35px;
+  }
+  .social-icon {
+    max-width: 30px;
+  }
+  .vs img {
+    max-width: 90%;
+  }
+
+  @media (max-width: 1399px) and (min-width: 1200px) {
+    .participant-div .input-group {
+      max-width: 163px;
+    }
+    .label-position, .level-participant label,
+    .level-config label, .level-config input {
+      width: 30px;
+    }
+  }
