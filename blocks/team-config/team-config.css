@@ -207,9 +207,6 @@ a {
   }
 
   @media (max-width: 1399px) and (min-width: 1200px) {
-    .participant-div .input-group {
-      max-width: 163px;
-    }
     .label-position, .level-participant label,
     .level-config label, .level-config input {
       width: 30px;

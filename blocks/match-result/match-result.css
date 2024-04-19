@@ -12,6 +12,10 @@
     right: 12.5px;
 }
 
+.result {
+    width: 90vw;
+}
+
 .player {
     background-color: #fff;
     cursor: pointer;
@@ -48,10 +52,4 @@
     position: absolute;
     color: #fff;
     right: -150px;
-}
-
-@media (min-width: 576px ){
-    .player {
-        min-width: 455px;
-    }
 }

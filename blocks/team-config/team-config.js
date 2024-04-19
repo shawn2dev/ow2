@@ -134,6 +134,31 @@ const addPlayer = (index, player) => {
     });
 };
 
+const removePlayer = (index) => {
+    const p = document.getElementById(`mix_players__${index}`);
+    p.parentElement.remove();
+    state.players.splice(index, 1);
+}
+
+const numParticipantsEvent = () => {
+    const participantsSelect = document.getElementById('nb-participants');
+    participantsSelect.value = state.numOfPlayers || 10;
+    participantsSelect.addEventListener('change', (e) => {     
+        const currentPlayers = document.querySelectorAll('.participant-div');
+        if (currentPlayers.length < participantsSelect.value) {
+            for (let i=currentPlayers.length; i<participantsSelect.value; i++) {
+                addPlayer(i);
+            }
+        } else {
+            for (let i=currentPlayers.length-1; i>=participantsSelect.value; i--) {
+                removePlayer(i);
+            }
+        }
+        state.numOfPlayers = participantsSelect.value;
+        saveState();
+    });
+}
+
 const initTeam = () => {
     if (window.localStorage.state) {
         state = JSON.parse(window.localStorage.state);
@@ -154,6 +179,7 @@ const initTeam = () => {
             addPlayer(i);
         }
     }
+    numParticipantsEvent();
     levelConfig();
 };
 
@@ -164,7 +190,19 @@ const initHtmlBody = `<div class="container">
     <div class="bg-grey-opacity">
         <div class="container pb-5 position-relative">
             <div class="general-config row align-items-center py-3 mb-3 border-bottom border-dark">
-                <div class="level-config col-12 offset-xl-5 col-xl-7 row gap-2"></div>
+                <div class="form-group col-1">
+                    <select class="head-select px-2" id="nb-participants" control-id="ControlID-3">
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+
+                    </select>
+                </div>
+                <div class="level-config col-11 offset-xl-4 col-xl-7 row gap-2"></div>
             </div>
             <div id="mix_players"></div>
             <div

@@ -11,76 +11,108 @@ const positionOrder = {
 	'all': 6,
 }
 
-const balanceTeamsByLevels = (players) => {
-	// Shuffle the players array
-	players = shuffle(players);
-	// players.sort((a, b) => b.level - a.level);
+const balanceTeamsByLevels = (players, numPlayersPerTeam) => {
+    // Shuffle the players array
+    players = shuffle(players);
+    
+    // Determine the number of teams
+    const numTeams = players.length / numPlayersPerTeam;
 
-	// Determine the number of players per team
-	const numPlayersPerTeam = Math.floor(players.length / 2);
+    // Initialize an array to hold all teams
+    const teams = Array.from({ length: numTeams }, () => []);
 
-	// Initialize two empty teams
-	const team1 = [];
-	const team2 = [];
+    // Initialize variables to keep track of the total skill of each team
+    const totalSkill = Array.from({ length: numTeams }, () => 0);
 
-	// Initialize variables to keep track of the total skill of each team
-	let totalSkill1 = 0;
-	let totalSkill2 = 0;
+    // Assign players to teams greedily, starting with the highest-skilled player
+    for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        const currentTeamIndex = i % numTeams;
+        const currentTeam = teams[currentTeamIndex];
+        currentTeam.push(player);
+        totalSkill[currentTeamIndex] += player.level;
+    }
 
-	// Assign players to teams greedily, starting with the highest-skilled player
-	for (let i = 0; i < players.length; i++) {
-		const player = players[i];
-		if (i % 2 === 0 && team1.length < numPlayersPerTeam) {
-			team1.push(player);
-			totalSkill1 += player.level;
-		} else if (team2.length < numPlayersPerTeam) {
-			team2.push(player);
-			totalSkill2 += player.level;
-		} else {
-			team1.push(player);
-			totalSkill1 += player.level;
-		}
-	}
+    // Calculate the average total skill for each team
+    const averageTotalSkill = totalSkill.reduce((acc, cur) => acc + cur) / numTeams;
 
-	// If the total skill of the two teams is not equal, swap one player between teams
-	const tolerance = 1; // You can adjust this tolerance value
-	const MAX_TRIAL = 200000; // to prevent infinity loop
-	let trial = 0;
-	while (Math.abs(totalSkill1 - totalSkill2) > tolerance && trial < MAX_TRIAL) {
-		let swapped = false;
-		for (let i = 0; i < team1.length; i++) {
-			for (let j = 0; j < team2.length; j++) {
-				const newTotalSkill1 = totalSkill1 - team1[i].level + team2[j].level;
-				const newTotalSkill2 = totalSkill2 - team2[j].level + team1[i].level;
-				if (Math.abs(newTotalSkill1 - newTotalSkill2) < Math.abs(totalSkill1 - totalSkill2)) {
-					const temp = team1[i];
-					team1[i] = team2[j];
-					team2[j] = temp;
-					totalSkill1 = newTotalSkill1;
-					totalSkill2 = newTotalSkill2;
-					swapped = true;
-					break;
-				}
-			}
-			if (swapped) {
-				break;
-			}
-		}
-		trial++;
-	}
+    // Redistribute players to balance skill levels
+    let iteration = 0;
+    while (iteration < 1000) {
+        let maxExcess = -Infinity;
+        let maxExcessTeamIndex = -1;
+        let minDeficit = Infinity;
+        let minDeficitTeamIndex = -1;
 
-	// Return an object with both teams
-	return { team1, team2 };
-}
+        // Find the team with the maximum excess skill and the team with the minimum deficit skill
+        for (let i = 0; i < numTeams; i++) {
+            const skillDifference = totalSkill[i] - averageTotalSkill;
+            if (skillDifference > maxExcess) {
+                maxExcess = skillDifference;
+                maxExcessTeamIndex = i;
+            }
+            if (skillDifference < minDeficit) {
+                minDeficit = skillDifference;
+                minDeficitTeamIndex = i;
+            }
+        }
+
+        // If teams are balanced within tolerance, exit the loop
+        if (Math.abs(maxExcess) <= 1 && Math.abs(minDeficit) <= 1) {
+            break;
+        }
+
+        // Find the player with the highest skill level in the maxExcess team
+        let maxExcessPlayer = null;
+        let maxExcessPlayerIndex = -1;
+        for (let i = 0; i < numPlayersPerTeam; i++) {
+            if (teams[maxExcessTeamIndex][i].level > (maxExcessPlayer?.level || -Infinity)) {
+                maxExcessPlayer = teams[maxExcessTeamIndex][i];
+                maxExcessPlayerIndex = i;
+            }
+        }
+
+        // Find the player with the lowest skill level in the minDeficit team
+        let minDeficitPlayer = null;
+        let minDeficitPlayerIndex = -1;
+        for (let i = 0; i < numPlayersPerTeam; i++) {
+            if (teams[minDeficitTeamIndex][i].level < (minDeficitPlayer?.level || Infinity)) {
+                minDeficitPlayer = teams[minDeficitTeamIndex][i];
+                minDeficitPlayerIndex = i;
+            }
+        }
+
+        // If minDeficitPlayer is null, break the loop
+        if (!minDeficitPlayer) {
+            break;
+        }
+
+        // Swap the players
+        teams[maxExcessTeamIndex][maxExcessPlayerIndex] = minDeficitPlayer;
+        teams[minDeficitTeamIndex][minDeficitPlayerIndex] = maxExcessPlayer;
+
+        // Update total skills
+        totalSkill[maxExcessTeamIndex] += minDeficitPlayer.level - maxExcessPlayer.level;
+        totalSkill[minDeficitTeamIndex] += maxExcessPlayer.level - minDeficitPlayer.level;
+
+        iteration++;
+    }
+
+    // Return an object with all teams
+    return teams;
+};
 
 const shuffle = (array) => {
-	// Fisher-Yates shuffle algorithm
-	for (let i = array.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[array[i], array[j]] = [array[j], array[i]];
-	}
-	return array;
-}
+    // Fisher-Yates shuffle algorithm
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
+
+
 
 const totalLevels = (team) => {
 	let sum = 0;
@@ -143,7 +175,7 @@ const generateTeam = (team) => {
 		summoners += `,${name.textContent}`;
 	});
 
-	return `<div class="team col-12 col-lg-6 col-xl-5 mb-3 mb-lg-0">
+	return `<div class="team col-12 col-lg-6 col-xl-4 mb-3 mb-lg-0">
     ${playersHTML}
     <div class="mt-1 d-flex justify-content-between">
         <div class="covered-positions d-flex mt-2 ${positionCounts < 3 ? 'warning border border-3 border-danger' : ''}">
@@ -208,7 +240,6 @@ const swapEventHandler = (block, teams) => {
 						
 						let summoners = '';
 						t.querySelectorAll('.player .name').forEach(n => summoners += `,${n.textContent}`);
-						t.querySelector('.opgg-all a').href = `https://www.op.gg/multisearch/na?summoners=${summoners.substring(1)}`;
 					});
 				}
 			} else {
@@ -220,7 +251,7 @@ const swapEventHandler = (block, teams) => {
 
 const resultBody = `
 <div class="container-fluid">
-    <div id="result_row" class="result bg-dark-grey-opacity p-3 row justify-content-between"></div>
+    <div id="result_row" class="result bg-dark-grey-opacity p-3 row"></div>
 </div>
 <div class="container-fluid rebalance-btn-container position-relative p-5 d-flex flex-column align-items-center justify-content-center">
 	<div class="position-absolute copy-message text-success"></div>
@@ -234,7 +265,11 @@ const resultBody = `
 
 const resultRender = (block, teams) => {
 	const result = block.querySelector('#result_row');
-	result.innerHTML = generateTeam(teams.team1) + generateTeam(teams.team2);
+	let html = '';
+	teams.forEach(team => {
+		html += generateTeam(team);
+	});
+	result.innerHTML = html;
 	swapEventHandler(block, teams);
 };
 
@@ -275,7 +310,7 @@ export default async function fn(block) {
 	block.innerHTML = resultBody;
 	window.localStorage.removeItem('matchHistory');
 	state = JSON.parse(window.localStorage.state);
-	const teams = balanceTeamsByLevels(state.players);
+	const teams = balanceTeamsByLevels(state.players, 5);
 	teamsHistory.push(teams);
 	resultRender(block, teams);
 	block.querySelector('#rerollBtn').addEventListener('click', () => historyHandler(block, 'reroll'));
