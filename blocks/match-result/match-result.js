@@ -276,7 +276,7 @@ const historyHandler = (block, eventName) => {
 	const nextBtn = document.getElementById('nextBtn');
 	let teams;
 	if (eventName === 'reroll') {
-		teams = balanceTeamsByLevels(state.players);
+		teams = balanceTeamsByLevels(state.players, 5);
 		teamsHistory.push(teams);
 		historyIndex = teamsHistory.length - 1;
 		resultRender(block, teams);
@@ -309,7 +309,7 @@ export default async function fn(block) {
 	window.localStorage.removeItem('matchHistory');
 	state = JSON.parse(window.localStorage.state);
 	const teams = balanceTeamsByLevels(state.players, 5);
-	console.log(teams);
+	// console.log(teams);
 	teamsHistory.push(teams);
 	resultRender(block, teams);
 	block.querySelector('#rerollBtn').addEventListener('click', () => historyHandler(block, 'reroll'));
