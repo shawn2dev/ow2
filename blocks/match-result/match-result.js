@@ -135,7 +135,7 @@ const generatePlayer = (player) => {
     </div>`;
 };
 
-const generateTeam = (team) => {
+const generateTeam = (team, index) => {
 	let coveredPostions = new Set();
 	let coveredPostionsHTML = '';
 	let playersHTML = '';
@@ -172,7 +172,8 @@ const generateTeam = (team) => {
 		summoners += `,${name.textContent}`;
 	});
 
-	return `<div class="team col-12 col-lg-6 col-xl-4 mb-3 mb-lg-0">
+	return `<div class="team col mb-3 mx-2 card bg-secondary">
+	<div><h3 class="text-white mt-3">Team ${index+1}</h3></div>
     ${playersHTML}
     <div class="mt-1 d-flex justify-content-between">
         <div class="covered-positions d-flex mt-2 ${positionCounts < 3 ? 'warning border border-3 border-danger' : ''}">
@@ -263,8 +264,8 @@ const resultBody = `
 const resultRender = (block, teams) => {
 	const result = block.querySelector('#result_row');
 	let html = '';
-	teams.forEach(team => {
-		html += generateTeam(team);
+	teams.forEach((team, index) => {
+		html += generateTeam(team, index);
 	});
 	result.innerHTML = html;
 	swapEventHandler(block, teams);

@@ -16,6 +16,11 @@
     width: 90vw;
 }
 
+.team.card {
+    min-width: 362px;
+    max-width: 362px;
+}
+
 .player {
     background-color: #fff;
     cursor: pointer;
