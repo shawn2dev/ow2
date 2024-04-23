@@ -111,9 +111,6 @@ const shuffle = (array) => {
     return array;
 };
 
-
-
-
 const totalLevels = (team) => {
 	let sum = 0;
 	team.forEach(p => sum += p.level);
@@ -311,6 +308,7 @@ export default async function fn(block) {
 	window.localStorage.removeItem('matchHistory');
 	state = JSON.parse(window.localStorage.state);
 	const teams = balanceTeamsByLevels(state.players, 5);
+	console.log(teams);
 	teamsHistory.push(teams);
 	resultRender(block, teams);
 	block.querySelector('#rerollBtn').addEventListener('click', () => historyHandler(block, 'reroll'));
