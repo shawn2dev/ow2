@@ -229,7 +229,7 @@ const swapEventHandler = (block, teams) => {
 							positionCounts++;
 						}
 						const cpEl = t.querySelector('.covered-positions');
-						if (positionCounts >= 5) {
+						if (positionCounts >= 3) {
 							cpEl.classList.remove('warning', 'border', 'border-3', 'border-danger');
 						} else {
 							cpEl.classList.add('warning', 'border', 'border-3', 'border-danger');
