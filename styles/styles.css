@@ -189,3 +189,11 @@ main img {
 header, footer {
   display: none;
 }
+
+header:not(.global-navigation) ~ main {
+  margin-top: 0 !important;
+}
+
+footer, .footer-small {
+  padding: 0 !important;
+}
