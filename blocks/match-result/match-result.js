@@ -38,62 +38,83 @@ const balanceTeamsByLevels = (players, numPlayersPerTeam) => {
 
     // Redistribute players to balance skill levels
     let iteration = 0;
-    while (iteration < 1000) {
-        let maxExcess = -Infinity;
-        let maxExcessTeamIndex = -1;
-        let minDeficit = Infinity;
-        let minDeficitTeamIndex = -1;
+    let temperature = 1000; // initial temperature
+    let coolingRate = 0.99; // cooling rate
 
-        // Find the team with the maximum excess skill and the team with the minimum deficit skill
+    while (iteration < 1000) {
+        let excessTeams = [];
+        let deficitTeams = [];
+
+        // Find teams with excess skill and teams with deficit skill
         for (let i = 0; i < numTeams; i++) {
             const skillDifference = totalSkill[i] - averageTotalSkill;
-            if (skillDifference > maxExcess) {
-                maxExcess = skillDifference;
-                maxExcessTeamIndex = i;
-            }
-            if (skillDifference < minDeficit) {
-                minDeficit = skillDifference;
-                minDeficitTeamIndex = i;
+            if (skillDifference > 0) {
+                excessTeams.push({ teamIndex: i, excess: skillDifference });
+            } else if (skillDifference < 0) {
+                deficitTeams.push({ teamIndex: i, deficit: -skillDifference });
             }
         }
 
-        // If teams are balanced within tolerance, exit the loop
-        if (Math.abs(maxExcess) <= 1 && Math.abs(minDeficit) <= 1) {
+        // If no teams have excess or deficit skill, exit the loop
+        if (excessTeams.length === 0 || deficitTeams.length === 0) {
             break;
         }
 
-        // Find the player with the highest skill level in the maxExcess team
-        let maxExcessPlayer = null;
-        let maxExcessPlayerIndex = -1;
-        for (let i = 0; i < numPlayersPerTeam; i++) {
-            if (teams[maxExcessTeamIndex][i].level > (maxExcessPlayer?.level || -Infinity)) {
-                maxExcessPlayer = teams[maxExcessTeamIndex][i];
-                maxExcessPlayerIndex = i;
+        // Sort excess teams by excess skill in descending order
+        excessTeams.sort((a, b) => b.excess - a.excess);
+
+        // Sort deficit teams by deficit skill in descending order
+        deficitTeams.sort((a, b) => b.deficit - a.deficit);
+
+        // Swap players between excess teams and deficit teams
+        for (let i = 0; i < excessTeams.length && i < deficitTeams.length; i++) {
+            const excessTeamIndex = excessTeams[i].teamIndex;
+            const deficitTeamIndex = deficitTeams[i].teamIndex;
+
+            // Find the player with the highest skill level in the excess team
+            let excessPlayer = null;
+            let excessPlayerIndex = -1;
+            for (let j = 0; j < numPlayersPerTeam; j++) {
+                if (teams[excessTeamIndex][j].level > (excessPlayer?.level || -Infinity)) {
+                    excessPlayer = teams[excessTeamIndex][j];
+                    excessPlayerIndex = j;
+                }
+            }
+
+            // Find the player with the lowest skill level in the deficit team
+            let deficitPlayer = null;
+            let deficitPlayerIndex = -1;
+            for (let j = 0; j < numPlayersPerTeam; j++) {
+                if (teams[deficitTeamIndex][j].level < (deficitPlayer?.level || Infinity)) {
+                    deficitPlayer = teams[deficitTeamIndex][j];
+                    deficitPlayerIndex = j;
+                }
+            }
+
+            // If deficitPlayer is null, break the loop
+            if (!deficitPlayer) {
+                break;
+            }
+
+            // Check if swapping players would worsen the balance
+            const excessSkillDifference = totalSkill[excessTeamIndex] - averageTotalSkill;
+            const deficitSkillDifference = totalSkill[deficitTeamIndex] - averageTotalSkill;
+            const delta = (excessSkillDifference - excessPlayer.level + deficitPlayer.level) * (deficitSkillDifference + excessPlayer.level - deficitPlayer.level);
+
+            // Accept the swap with a probability based on the temperature
+            if (Math.random() < Math.exp(-delta / temperature)) {
+                // Swap the players
+                teams[excessTeamIndex][excessPlayerIndex] = deficitPlayer;
+                teams[deficitTeamIndex][deficitPlayerIndex] = excessPlayer;
+
+                // Update total skills
+                totalSkill[excessTeamIndex] -= excessPlayer.level - deficitPlayer.level;
+                totalSkill[deficitTeamIndex] += excessPlayer.level - deficitPlayer.level;
             }
         }
 
-        // Find the player with the lowest skill level in the minDeficit team
-        let minDeficitPlayer = null;
-        let minDeficitPlayerIndex = -1;
-        for (let i = 0; i < numPlayersPerTeam; i++) {
-            if (teams[minDeficitTeamIndex][i].level < (minDeficitPlayer?.level || Infinity)) {
-                minDeficitPlayer = teams[minDeficitTeamIndex][i];
-                minDeficitPlayerIndex = i;
-            }
-        }
-
-        // If minDeficitPlayer is null, break the loop
-        if (!minDeficitPlayer) {
-            break;
-        }
-
-        // Swap the players
-        teams[maxExcessTeamIndex][maxExcessPlayerIndex] = minDeficitPlayer;
-        teams[minDeficitTeamIndex][minDeficitPlayerIndex] = maxExcessPlayer;
-
-        // Update total skills
-        totalSkill[maxExcessTeamIndex] += minDeficitPlayer.level - maxExcessPlayer.level;
-        totalSkill[minDeficitTeamIndex] += maxExcessPlayer.level - minDeficitPlayer.level;
+        // Decrease the temperature
+        temperature *= coolingRate;
 
         iteration++;
     }
@@ -173,7 +194,7 @@ const generateTeam = (team, index) => {
 	});
 
 	return `<div class="team col mb-3 mx-2 card bg-secondary">
-	<div><h3 class="text-white mt-3">Team ${index+1}</h3></div>
+	<div class="mx-auto"><input class="bg-black text-white mt-3 text-center" placeholder="Team ${index+1}"></div>
     ${playersHTML}
     <div class="mt-1 d-flex justify-content-between">
         <div class="covered-positions d-flex mt-2 ${positionCounts < 3 ? 'warning border border-3 border-danger' : ''}">
@@ -249,7 +270,7 @@ const swapEventHandler = (block, teams) => {
 
 const resultBody = `
 <div class="container-fluid">
-    <div id="result_row" class="result bg-dark-grey-opacity p-3 row"></div>
+    <div id="result_row" class="result bg-dark-grey-opacity p-3 row justify-content-center"></div>
 </div>
 <div class="container-fluid rebalance-btn-container position-relative p-5 d-flex flex-column align-items-center justify-content-center">
 	<div class="position-absolute copy-message text-success"></div>
