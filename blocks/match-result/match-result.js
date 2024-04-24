@@ -11,6 +11,68 @@ const positionOrder = {
 	'all': 6,
 }
 
+const balance2TeamsByLevels = (players) => {
+	// Shuffle the players array
+	players = shuffle(players);
+	// players.sort((a, b) => b.level - a.level);
+
+	// Determine the number of players per team
+	const numPlayersPerTeam = Math.floor(players.length / 2);
+
+	// Initialize two empty teams
+	const team1 = [];
+	const team2 = [];
+
+	// Initialize variables to keep track of the total skill of each team
+	let totalSkill1 = 0;
+	let totalSkill2 = 0;
+
+	// Assign players to teams greedily, starting with the highest-skilled player
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i];
+		if (i % 2 === 0 && team1.length < numPlayersPerTeam) {
+			team1.push(player);
+			totalSkill1 += player.level;
+		} else if (team2.length < numPlayersPerTeam) {
+			team2.push(player);
+			totalSkill2 += player.level;
+		} else {
+			team1.push(player);
+			totalSkill1 += player.level;
+		}
+	}
+
+	// If the total skill of the two teams is not equal, swap one player between teams
+	const tolerance = 1; // You can adjust this tolerance value
+	const MAX_TRIAL = 200000; // to prevent infinity loop
+	let trial = 0;
+	while (Math.abs(totalSkill1 - totalSkill2) > tolerance && trial < MAX_TRIAL) {
+		let swapped = false;
+		for (let i = 0; i < team1.length; i++) {
+			for (let j = 0; j < team2.length; j++) {
+				const newTotalSkill1 = totalSkill1 - team1[i].level + team2[j].level;
+				const newTotalSkill2 = totalSkill2 - team2[j].level + team1[i].level;
+				if (Math.abs(newTotalSkill1 - newTotalSkill2) < Math.abs(totalSkill1 - totalSkill2)) {
+					const temp = team1[i];
+					team1[i] = team2[j];
+					team2[j] = temp;
+					totalSkill1 = newTotalSkill1;
+					totalSkill2 = newTotalSkill2;
+					swapped = true;
+					break;
+				}
+			}
+			if (swapped) {
+				break;
+			}
+		}
+		trial++;
+	}
+
+	// Return an object with both teams
+	return [ team1, team2 ];
+}
+
 const balanceTeamsByLevels = (players, numPlayersPerTeam) => {
     // Shuffle the players array
     players = shuffle(players);
@@ -297,7 +359,7 @@ const historyHandler = (block, eventName) => {
 	const nextBtn = document.getElementById('nextBtn');
 	let teams;
 	if (eventName === 'reroll') {
-		teams = balanceTeamsByLevels(state.players, 5);
+		teams = state.players.length === 10 ? balance2TeamsByLevels(state.players) : balanceTeamsByLevels(state.players, 5);
 		teamsHistory.push(teams);
 		historyIndex = teamsHistory.length - 1;
 		resultRender(block, teams);
@@ -329,7 +391,8 @@ export default async function fn(block) {
 	block.innerHTML = resultBody;
 	window.localStorage.removeItem('matchHistory');
 	state = JSON.parse(window.localStorage.state);
-	const teams = balanceTeamsByLevels(state.players, 5);
+	console.log(state.players.length);
+	const teams = state.players.length === 10 ? balance2TeamsByLevels(state.players) : balanceTeamsByLevels(state.players, 5);
 	// console.log(teams);
 	teamsHistory.push(teams);
 	resultRender(block, teams);
