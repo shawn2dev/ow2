@@ -218,19 +218,18 @@ const generatePlayer = (player) => {
     </div>`;
 };
 
-const generateTeam = (team, index) => {
+const generateTeam = (teamIncoming, index) => {
+	let team = teamIncoming.sort((player1, player2) => {return player2.level - player1.level});
 	let coveredPostions = new Set();
 	let coveredPostionsHTML = '';
 	let playersHTML = '';
 	let allCounts = 0;
 	let positionCounts = 0;
+	
 	team.forEach(p => {
 		playersHTML += generatePlayer(p)
 		p.position.forEach(position => {
 			coveredPostions.add(position);
-			if (position === 'all') {
-				allCounts++;
-			}
 		});
 	});
 	coveredPostions = [...(coveredPostions)].sort((a, b) => {

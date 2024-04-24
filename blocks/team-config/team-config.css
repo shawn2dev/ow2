@@ -53,6 +53,18 @@ a {
     background-color: var(--bs-blue);
     color: #fff;
   }
+
+  .label-position-deal.active,
+  .icon.label-position-deal {
+    background-color: var(--bs-danger);
+  }
+
+  .label-position-heal.active,
+  .icon.label-position-heal {
+    background-color: #29ab6f;
+  }
+
+
   .head-label:hover {
     background: inherit;
     color: #000;
@@ -167,10 +179,7 @@ a {
   .team-config {
     position: relative;
     z-index: 1;
-    background-image: url('/assets/images/HD-wallpaper-overwatch-2.jpg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background: #495057;
     min-height: 100vh;
   }
   

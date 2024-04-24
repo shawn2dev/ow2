@@ -189,7 +189,7 @@ const initHtmlBody = `<div class="container">
 <form id="mix_form" name="mix" autocomplete="on" onsubmit="return submitted()">
     <div class="bg-grey-opacity">
         <div class="container pb-5 position-relative">
-            <div class="general-config row align-items-center py-3 mb-3 border-bottom border-dark">
+            <div class="general-config row align-items-center py-3 mb-3 border-bottom border-dark border-3">
                 <div class="form-group col-1">
                     <select class="head-select px-2" id="nb-participants" control-id="ControlID-3">
                         <option value="10" selected>10</option>
