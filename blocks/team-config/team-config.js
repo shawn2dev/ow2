@@ -22,6 +22,7 @@ const defaultLevelMap = {
     DM : 10,
     M : 12,
     GM : 14,
+    C: 16,
 };
 
 let state = {
